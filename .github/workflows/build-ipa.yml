@@ -1,0 +1,71 @@
+name: Build Alsrori iOS IPA
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Package Alsrori IPA
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode & System Info
+        run: |
+          echo "=== System Info ==="
+          sw_vers
+          echo "=== Available Xcode versions ==="
+          ls -d /Applications/Xcode* || true
+
+      - name: Select Xcode Version
+        run: |
+          if [ -d "/Applications/Xcode_15.4.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_15.4.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_16.0.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.0.app/Contents/Developer
+          elif [ -d "/Applications/Xcode.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+          fi
+          xcodebuild -version
+
+      - name: Resolve Swift Package Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -project Alsrori.xcodeproj -scheme Alsrori
+
+      - name: Build Archive (Release)
+        run: |
+          xcodebuild -project Alsrori.xcodeproj \
+            -scheme Alsrori \
+            -configuration Release \
+            -archivePath build/Alsrori.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive
+
+      - name: Export Payload & Create IPA
+        run: |
+          mkdir -p build/Payload
+          cp -r build/Alsrori.xcarchive/Products/Applications/Alsrori.app build/Payload/Alsrori.app
+          cd build && zip -r9 Alsrori.ipa Payload
+          ls -lh Alsrori.ipa
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Alsrori-iOS-IPA
+          path: build/Alsrori.ipa
+          retention-days: 30
+          if-no-files-found: error
