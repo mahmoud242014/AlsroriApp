@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ar</string>
+	<key>CFBundleDisplayName</key>
+	<string>Alsrori</string>
+	<key>CFBundleExecutable</key>
+	<string>Alsrori</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.alsrori.app</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Alsrori</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>NSCameraUsageDescription</key>
+	<string>يتطلب تطبيق Alsrori الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو ونشرها في المنشورات والقصص</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>يتطلب تطبيق Alsrori الوصول إلى مكتبة الصور لاختيار ومشاركة الصور ومقاطع الفيديو</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>يتطلب تطبيق Alsrori الإذن لحفظ الصور ومقاطع الفيديو في مكتبة الصور</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>يتطلب تطبيق Alsrori الوصول إلى الميكروفون لتسجيل الرسائل الصوتية والفيديوهات والمكالمات</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>يتطلب تطبيق Alsrori الوصول إلى الموقع لمشاركة موقعك وإظهار المنشورات والأنشطة القريبة منك</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+</dict>
+</plist>
