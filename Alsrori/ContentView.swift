@@ -12,11 +12,17 @@ struct ContentView: View {
     @State private var logoOffsetY: CGFloat = 0
     
     var body: some View {
-        ZStack {
-            // Main Webview - True 100% Fullscreen Edge-To-Edge (Zero Borders)
-            WebView(url: URL(string: urlString)!, isLoading: $isLoading)
+        ZStack(alignment: .top) {
+            // Dark theme background matching alsrori.com (#0b0f19)
+            // Extends seamlessly into the status bar area to provide a unified, premium native header bar
+            Color(red: 11/255, green: 15/255, blue: 25/255)
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
+            
+            // Main Webview starting safely below the Status Bar / Dynamic Island / Notch
+            // Extends seamlessly to the bottom edge for the home indicator
+            WebView(url: URL(string: urlString)!, isLoading: $isLoading)
+                .ignoresSafeArea(edges: .bottom)
             
             // Custom Native Splash Screen with Official Alsrori Logo
             if isLoading {
@@ -118,8 +124,7 @@ struct ContentView: View {
                 .zIndex(10)
             }
         }
-        .edgesIgnoringSafeArea(.all)
-        .ignoresSafeArea()
+        .preferredColorScheme(.dark)
         .onAppear {
             withAnimation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
                 pulseScale = 1.18
@@ -140,7 +145,7 @@ struct ContentView: View {
     }
 }
 
-// WKWebView True Edge-to-Edge with Zero Insets & System Notification Bridge
+// WKWebView True Adaptive Edge-to-Edge with Protected Top Safe Area
 struct WebView: UIViewRepresentable {
     let url: URL
     @Binding var isLoading: Bool
@@ -171,7 +176,7 @@ struct WebView: UIViewRepresentable {
         // Gesture Navigation (Swipe to go back/forward)
         webView.allowsBackForwardNavigationGestures = true
         
-        // Edge-To-Edge (Zero Border) Configuration
+        // Scroll view adjustment - Top is handled cleanly by SwiftUI safe area
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.isOpaque = false
         webView.backgroundColor = UIColor(red: 11/255, green: 15/255, blue: 25/255, alpha: 1.0)

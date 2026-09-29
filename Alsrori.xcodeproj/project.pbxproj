@@ -285,10 +285,10 @@
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OneSignalNotificationServiceExtension;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to allow you to live stream your video and video calls";
+				INFOPLIST_KEY_NSCameraUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو ونشرها في المنشورات والقصص";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to find friends and content near you";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the mic to allow you to live stream your video and audio/video calls";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الموقع لمشاركة موقعك وإظهار المنشورات والأنشطة القريبة منك";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الميكروفون لتسجيل الرسائل الصوتية والفيديوهات والمكالمات";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -321,10 +321,10 @@
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OneSignalNotificationServiceExtension;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to allow you to live stream your video and video calls";
+				INFOPLIST_KEY_NSCameraUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو ونشرها في المنشورات والقصص";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to find friends and content near you";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the mic to allow you to live stream your video and audio/video calls";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الموقع لمشاركة موقعك وإظهار المنشورات والأنشطة القريبة منك";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الميكروفون لتسجيل الرسائل الصوتية والفيديوهات والمكالمات";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -475,9 +475,9 @@
 				INFOPLIST_FILE = Alsrori/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Alsrori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to allow you to live stream your video and video calls";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to find friends and content near you";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the mic to allow you to live stream your video and audio/video calls";
+				INFOPLIST_KEY_NSCameraUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو ونشرها في المنشورات والقصص";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الموقع لمشاركة موقعك وإظهار المنشورات والأنشطة القريبة منك";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الميكروفون لتسجيل الرسائل الصوتية والفيديوهات والمكالمات";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -515,9 +515,9 @@
 				INFOPLIST_FILE = Alsrori/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Alsrori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to allow you to live stream your video and video calls";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to find friends and content near you";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the mic to allow you to live stream your video and audio/video calls";
+				INFOPLIST_KEY_NSCameraUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو ونشرها في المنشورات والقصص";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الموقع لمشاركة موقعك وإظهار المنشورات والأنشطة القريبة منك";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "يتطلب تطبيق Alsrori الوصول إلى الميكروفون لتسجيل الرسائل الصوتية والفيديوهات والمكالمات";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
