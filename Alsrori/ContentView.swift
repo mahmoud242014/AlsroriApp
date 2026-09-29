@@ -1,6 +1,7 @@
 import SwiftUI
 import WebKit
 import UserNotifications
+import OneSignalFramework
 
 struct ContentView: View {
     let urlString: String = "https://alsrori.com/"
@@ -167,11 +168,13 @@ struct WebView: UIViewRepresentable {
         // Native JavaScript Bridge
         let contentController = WKUserContentController()
         contentController.add(context.coordinator, name: "AlsroriNotification")
+        contentController.add(context.coordinator, name: "AlsroriSyncPush")
         config.userContentController = contentController
         
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
+        context.coordinator.webView = webView
         
         // Gesture Navigation (Swipe to go back/forward)
         webView.allowsBackForwardNavigationGestures = true
@@ -201,9 +204,70 @@ struct WebView: UIViewRepresentable {
     
     class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
         var parent: WebView
+        weak var webView: WKWebView?
         
         init(_ parent: WebView) {
             self.parent = parent
+            super.init()
+            
+            // Listen for notification deep link clicks outside the app
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleNavigateToURL(_:)),
+                name: NSNotification.Name("AlsroriNavigateToURL"),
+                object: nil
+            )
+            
+            // Listen for OneSignal subscription ID updates
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleOneSignalSubscribed(_:)),
+                name: NSNotification.Name("AlsroriOneSignalSubscribed"),
+                object: nil
+            )
+        }
+        
+        deinit {
+            NotificationCenter.default.removeObserver(self)
+        }
+        
+        @objc func handleNavigateToURL(_ notification: Notification) {
+            guard let urlString = notification.object as? String,
+                  let targetUrl = URL(string: urlString) else { return }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let webView = self?.webView else { return }
+                var request = URLRequest(url: targetUrl)
+                request.cachePolicy = .reloadIgnoringLocalCacheData
+                webView.load(request)
+            }
+        }
+        
+        @objc func handleOneSignalSubscribed(_ notification: Notification) {
+            DispatchQueue.main.async { [weak self] in
+                guard let webView = self?.webView else { return }
+                self?.syncOneSignal(with: webView)
+            }
+        }
+        
+        // Sync OneSignal Device Subscription with Sngine backend
+        func syncOneSignal(with webView: WKWebView) {
+            let subId = OneSignal.User.pushSubscription.id ?? ""
+            let syncJs = """
+            (function() {
+                var subId = '\(subId)';
+                if (!subId) {
+                    try { subId = window.localStorage.getItem('alsrori_ios_onesignal_id') || ''; } catch(e) {}
+                }
+                if (subId) {
+                    try { window.localStorage.setItem('alsrori_ios_onesignal_id', subId); } catch(e) {}
+                    if (window.$ && window.api && window.api['users/push_notifications']) {
+                        $.post(api['users/push_notifications'], { handle: 'update_ios', id: subId });
+                    }
+                }
+            })();
+            """
+            webView.evaluateJavaScript(syncJs, completionHandler: nil)
         }
         
         // Message handler from JavaScript bridge
@@ -212,6 +276,10 @@ struct WebView: UIViewRepresentable {
                 let title = body["title"] as? String ?? "Alsrori"
                 let msg = body["message"] as? String ?? ""
                 triggerNativeNotification(title: title, body: msg)
+            } else if message.name == "AlsroriSyncPush" {
+                if let wv = self.webView {
+                    self.syncOneSignal(with: wv)
+                }
             }
         }
         
@@ -256,6 +324,9 @@ struct WebView: UIViewRepresentable {
                 }
             }
             
+            // Sync OneSignal push subscription with Sngine
+            self.syncOneSignal(with: webView)
+            
             // JavaScript Bridge Injection for Notifications & Fullscreen Optimization
             let jsBridge = """
             (function() {
@@ -264,6 +335,13 @@ struct WebView: UIViewRepresentable {
                         try {
                             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.AlsroriNotification) {
                                 window.webkit.messageHandlers.AlsroriNotification.postMessage({title: title, message: message});
+                            }
+                        } catch(e) {}
+                    },
+                    syncPushToken: function() {
+                        try {
+                            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.AlsroriSyncPush) {
+                                window.webkit.messageHandlers.AlsroriSyncPush.postMessage({});
                             }
                         } catch(e) {}
                     }
@@ -279,6 +357,20 @@ struct WebView: UIViewRepresentable {
                         return Promise.resolve("granted");
                     };
                 }
+                
+                // Auto sync push token when user signs in or AJAX finishes
+                if (window.$) {
+                    $(document).ajaxComplete(function(e, xhr, settings) {
+                        if (settings && settings.url && (settings.url.indexOf('signin') !== -1 || settings.url.indexOf('signup') !== -1 || settings.url.indexOf('notifications') !== -1)) {
+                            setTimeout(function() {
+                                if (window.AlsroriNative && window.AlsroriNative.syncPushToken) {
+                                    window.AlsroriNative.syncPushToken();
+                                }
+                            }, 800);
+                        }
+                    });
+                }
+                
                 document.documentElement.classList.add("alsrori-native-app", "alsrori-fullscreen");
                 document.body.classList.add("alsrori-native-app", "alsrori-fullscreen");
             })();
