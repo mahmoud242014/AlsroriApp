@@ -473,7 +473,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Alsrori/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ChatbotsApp;
+				INFOPLIST_KEY_CFBundleDisplayName = Alsrori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to allow you to live stream your video and video calls";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to find friends and content near you";
@@ -513,7 +513,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Alsrori/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ChatbotsApp;
+				INFOPLIST_KEY_CFBundleDisplayName = Alsrori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to allow you to live stream your video and video calls";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to find friends and content near you";
