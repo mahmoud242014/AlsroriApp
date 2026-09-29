@@ -7,29 +7,36 @@ struct ContentView: View {
     let urlString: String = "https://alsrori.com/"
     
     @State private var isLoading: Bool = true
+    @State private var isNightMode: Bool = true
     @State private var progress: Double = 0.15
     @State private var pulseScale: CGFloat = 0.95
     @State private var pulseOpacity: Double = 0.5
     @State private var logoOffsetY: CGFloat = 0
     
+    // Dynamic theme background that matches Sngine's header
+    // Night Mode: #0b0f19
+    // Day/Light Mode: Pure White #ffffff
+    var themeColor: Color {
+        isNightMode ? Color(red: 11/255, green: 15/255, blue: 25/255) : Color.white
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
-            // Dark theme background matching alsrori.com (#0b0f19)
-            // Extends seamlessly into the status bar area to provide a unified, premium native header bar
-            Color(red: 11/255, green: 15/255, blue: 25/255)
+            // Dynamic edge-to-edge background matching the site mode
+            // Blends seamlessly into status bar, notch, and Dynamic Island (0 black bars)
+            themeColor
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
             
-            // Main Webview starting safely below the Status Bar / Dynamic Island / Notch
-            // Extends seamlessly to the bottom edge for the home indicator
-            WebView(url: URL(string: urlString)!, isLoading: $isLoading)
-                .ignoresSafeArea(edges: .bottom)
+            // Webview flows seamlessly across the ENTIRE screen (True Edge-to-Edge like Facebook)
+            WebView(url: URL(string: urlString)!, isLoading: $isLoading, isNightMode: $isNightMode)
+                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
             
-            // Custom Native Splash Screen with Official Alsrori Logo
+            // Custom Native Splash Screen
             if isLoading {
                 ZStack {
-                    // Dark theme background matching alsrori.com (#0b0f19)
-                    Color(red: 11/255, green: 15/255, blue: 25/255)
+                    themeColor
                         .edgesIgnoringSafeArea(.all)
                         .ignoresSafeArea()
                     
@@ -38,7 +45,6 @@ struct ContentView: View {
                         
                         // Brand Wrap with Animated Glow Ring & Floating Logo
                         ZStack {
-                            // Radial Glow Ring
                             Circle()
                                 .fill(
                                     RadialGradient(
@@ -57,14 +63,13 @@ struct ContentView: View {
                                 .opacity(pulseOpacity)
                                 .blur(radius: 12)
                             
-                            // Official Alsrori Logo Image
                             if let uiLogo = UIImage(named: "LaunchLogo") ?? UIImage(named: "LaunchLogo.png") ?? UIImage(contentsOfFile: Bundle.main.path(forResource: "LaunchLogo", ofType: "png") ?? "") ?? UIImage(named: "180.png") {
                                 Image(uiImage: uiLogo)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 96, height: 96)
                                     .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                                    .shadow(color: Color.black.opacity(0.45), radius: 18, x: 0, y: 10)
+                                    .shadow(color: Color.black.opacity(isNightMode ? 0.45 : 0.15), radius: 18, x: 0, y: 10)
                                     .offset(y: logoOffsetY)
                             } else {
                                 Image("LaunchLogo")
@@ -72,21 +77,18 @@ struct ContentView: View {
                                     .scaledToFit()
                                     .frame(width: 96, height: 96)
                                     .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                                    .shadow(color: Color.black.opacity(0.45), radius: 18, x: 0, y: 10)
+                                    .shadow(color: Color.black.opacity(isNightMode ? 0.45 : 0.15), radius: 18, x: 0, y: 10)
                                     .offset(y: logoOffsetY)
                             }
                         }
                         .frame(width: 130, height: 130)
                         .padding(.bottom, 28)
                         
-                        // Smooth Progress Track & Animated Glow Bar
                         ZStack(alignment: .leading) {
-                            // Track
                             Capsule()
-                                .fill(Color.white.opacity(0.12))
+                                .fill(isNightMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08))
                                 .frame(width: 180, height: 4)
                             
-                            // Fill
                             Capsule()
                                 .fill(
                                     LinearGradient(
@@ -104,11 +106,10 @@ struct ContentView: View {
                         }
                         .padding(.bottom, 18)
                         
-                        // Brand Title & Animated Dots
                         HStack(spacing: 6) {
                             Text("Alsrori")
                                 .font(.system(size: 17, weight: .bold, design: .rounded))
-                                .foregroundColor(Color(red: 241/255, green: 245/255, blue: 249/255))
+                                .foregroundColor(isNightMode ? Color(red: 241/255, green: 245/255, blue: 249/255) : Color(red: 30/255, green: 41/255, blue: 59/255))
                                 .tracking(0.5)
                             
                             HStack(spacing: 4) {
@@ -125,7 +126,10 @@ struct ContentView: View {
                 .zIndex(10)
             }
         }
-        .preferredColorScheme(.dark)
+        // Dynamically change Status Bar icons:
+        // Dark Mode: White icons (battery, wifi, clock)
+        // Day/Light Mode: Black icons (battery, wifi, clock) like Facebook
+        .preferredColorScheme(isNightMode ? .dark : .light)
         .onAppear {
             withAnimation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
                 pulseScale = 1.18
@@ -146,10 +150,11 @@ struct ContentView: View {
     }
 }
 
-// WKWebView True Adaptive Edge-to-Edge with Protected Top Safe Area
+// WKWebView True Adaptive Edge-to-Edge with Full Status Bar Integration
 struct WebView: UIViewRepresentable {
     let url: URL
     @Binding var isLoading: Bool
+    @Binding var isNightMode: Bool
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -161,14 +166,12 @@ struct WebView: UIViewRepresentable {
         config.mediaTypesRequiringUserActionForPlayback = []
         config.allowsAirPlayForMediaPlayback = true
         config.allowsPictureInPictureMediaPlayback = true
-        
-        // Persistent Website Data Store for Cookies & Sessions
         config.websiteDataStore = WKWebsiteDataStore.default()
         
-        // Native JavaScript Bridge
         let contentController = WKUserContentController()
         contentController.add(context.coordinator, name: "AlsroriNotification")
         contentController.add(context.coordinator, name: "AlsroriSyncPush")
+        contentController.add(context.coordinator, name: "AlsroriTheme")
         config.userContentController = contentController
         
         let webView = WKWebView(frame: .zero, configuration: config)
@@ -176,13 +179,12 @@ struct WebView: UIViewRepresentable {
         webView.uiDelegate = context.coordinator
         context.coordinator.webView = webView
         
-        // Gesture Navigation (Swipe to go back/forward)
         webView.allowsBackForwardNavigationGestures = true
         
-        // Scroll view adjustment - Top is handled cleanly by SwiftUI safe area
+        // Facebook Edge-to-Edge style: .never allows the web content to flow behind status bar
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(red: 11/255, green: 15/255, blue: 25/255, alpha: 1.0)
+        webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
         webView.scrollView.bounces = true
         webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1 AlsroriApp"
@@ -217,14 +219,6 @@ struct WebView: UIViewRepresentable {
                 name: NSNotification.Name("AlsroriNavigateToURL"),
                 object: nil
             )
-            
-            // Listen for OneSignal subscription ID updates
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(handleOneSignalSubscribed(_:)),
-                name: NSNotification.Name("AlsroriOneSignalSubscribed"),
-                object: nil
-            )
         }
         
         deinit {
@@ -243,14 +237,6 @@ struct WebView: UIViewRepresentable {
             }
         }
         
-        @objc func handleOneSignalSubscribed(_ notification: Notification) {
-            DispatchQueue.main.async { [weak self] in
-                guard let webView = self?.webView else { return }
-                self?.syncOneSignal(with: webView)
-            }
-        }
-        
-        // Sync OneSignal Device Subscription with Sngine backend
         func syncOneSignal(with webView: WKWebView) {
             let subId = OneSignal.User.pushSubscription.id ?? ""
             let syncJs = """
@@ -270,7 +256,6 @@ struct WebView: UIViewRepresentable {
             webView.evaluateJavaScript(syncJs, completionHandler: nil)
         }
         
-        // Message handler from JavaScript bridge
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if message.name == "AlsroriNotification", let body = message.body as? [String: Any] {
                 let title = body["title"] as? String ?? "Alsrori"
@@ -279,6 +264,14 @@ struct WebView: UIViewRepresentable {
             } else if message.name == "AlsroriSyncPush" {
                 if let wv = self.webView {
                     self.syncOneSignal(with: wv)
+                }
+            } else if message.name == "AlsroriTheme", let body = message.body as? [String: Any] {
+                if let night = body["nightMode"] as? Bool {
+                    DispatchQueue.main.async {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            self.parent.isNightMode = night
+                        }
+                    }
                 }
             }
         }
@@ -300,7 +293,6 @@ struct WebView: UIViewRepresentable {
             refreshControl.endRefreshing()
         }
         
-        // Navigation Policy: Open external URLs (tel, mailto, whatsapp, maps) in native system apps
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             guard let url = navigationAction.request.url else {
                 decisionHandler(.allow)
@@ -327,7 +319,6 @@ struct WebView: UIViewRepresentable {
             // Sync OneSignal push subscription with Sngine
             self.syncOneSignal(with: webView)
             
-            // JavaScript Bridge Injection for Notifications & Fullscreen Optimization
             let jsBridge = """
             (function() {
                 window.AlsroriNative = {
@@ -344,8 +335,31 @@ struct WebView: UIViewRepresentable {
                                 window.webkit.messageHandlers.AlsroriSyncPush.postMessage({});
                             }
                         } catch(e) {}
+                    },
+                    updateTheme: function() {
+                        try {
+                            var isNight = document.body.classList.contains('night-mode') || 
+                                          document.documentElement.classList.contains('night-mode') || 
+                                          (document.cookie && document.cookie.indexOf('night_mode=1') !== -1);
+                            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.AlsroriTheme) {
+                                window.webkit.messageHandlers.AlsroriTheme.postMessage({ nightMode: isNight });
+                            }
+                        } catch(e) {}
                     }
                 };
+                
+                window.AlsroriNative.updateTheme();
+                
+                var themeObserver = new MutationObserver(function() {
+                    window.AlsroriNative.updateTheme();
+                });
+                if (document.body) {
+                    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+                }
+                if (document.documentElement) {
+                    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                }
+                
                 if (!window.Notification || window.Notification.permission !== "granted") {
                     window.Notification = function(title, options) {
                         var body = options ? (options.body || "") : "";
@@ -358,15 +372,17 @@ struct WebView: UIViewRepresentable {
                     };
                 }
                 
-                // Auto sync push token when user signs in or AJAX finishes
                 if (window.$) {
                     $(document).ajaxComplete(function(e, xhr, settings) {
-                        if (settings && settings.url && (settings.url.indexOf('signin') !== -1 || settings.url.indexOf('signup') !== -1 || settings.url.indexOf('notifications') !== -1)) {
+                        if (settings && settings.url && (settings.url.indexOf('signin') !== -1 || settings.url.indexOf('signup') !== -1 || settings.url.indexOf('notifications') !== -1 || settings.url.indexOf('theme') !== -1)) {
                             setTimeout(function() {
                                 if (window.AlsroriNative && window.AlsroriNative.syncPushToken) {
                                     window.AlsroriNative.syncPushToken();
                                 }
-                            }, 800);
+                                if (window.AlsroriNative && window.AlsroriNative.updateTheme) {
+                                    window.AlsroriNative.updateTheme();
+                                }
+                            }, 500);
                         }
                     });
                 }
@@ -378,7 +394,6 @@ struct WebView: UIViewRepresentable {
             webView.evaluateJavaScript(jsBridge, completionHandler: nil)
         }
         
-        // JavaScript Dialogs Support (Alert / Confirm / Prompt)
         func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
             let alert = UIAlertController(title: "Alsrori", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "حسناً", style: .default, handler: { _ in completionHandler() }))
